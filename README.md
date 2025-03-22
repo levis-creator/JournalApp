@@ -1,169 +1,229 @@
-# TailAdmin Next.js - Free Next.js Tailwind Admin Dashboard Template
+---
 
-TailAdmin is a free and open-source admin dashboard template built on **Next.js and Tailwind CSS** providing developers with everything they need to create a feature-rich and data-driven: back-end, dashboard, or admin panel solution for any sort of web project.
+# **Personal Journaling App**
 
-![TailAdmin - Next.js Dashboard Preview](./banner.png)
+This is a full-stack personal journaling application built with **Next.js** (TypeScript) and **Prisma**. It allows users to securely create, manage, and analyze their journal entries with features like categorization, summaries, and optional AI-powered insights.
 
-With TailAdmin Next.js, you get access to all the necessary dashboard UI components, elements, and pages required to build a high-quality and complete dashboard or admin panel. Whether you're building a dashboard or admin panel for a complex web application or a simple website. 
+---
 
-TailAdmin utilizes the powerful features of **Next.js 15** and common features of Next.js such as server-side rendering (SSR), static site generation (SSG), and seamless API route integration. Combined with the advancements of **React 19** and the robustness of **TypeScript**, TailAdmin is the perfect solution to help get your project up and running quickly.
+## **Table of Contents**
+1. Features
+2. Tech Stack
+3. Setup Instructions
+4. Environment Variables
+5. API Documentation
+6. System Design
+7. Testing
+8. Contributing
 
-## Overview
+---
 
-TailAdmin provides essential UI components and layouts for building feature-rich, data-driven admin dashboards and control panels. It's built on:
+## **Features**
+- **User Authentication**: Secure registration and login using JWT.
+- **Journal Management**: Create, read, update, and delete journal entries.
+- **Categorization**: Tag entries with custom categories.
+- **Summary Analytics**: Visualize entry frequency, category distribution, and word count trends.
+- **Optional AI Features**: Sentiment analysis, auto-categorization, and writing prompts.
 
-- Next.js 15
-- React 19
-- TypeScript
-- Tailwind CSS
+---
 
-### Quick Links
-- [✨ Visit Website](https://tailadmin.com)
-- [📄 Documentation](https://tailadmin.com/docs)
-- [⬇️ Download](https://tailadmin.com/download)
-- [🖌️ Figma Design File (Community Edition)](https://www.figma.com/community/file/1463141366275764364)
-- [⚡ Get PRO Version](https://tailadmin.com/pricing)
+## **Tech Stack**
+- **Frontend**: Next.js (TypeScript), TailwindCSS
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL (managed with Prisma)
+- **Authentication**: JWT with HTTP-only cookies
+- **State Management**: React Query
+- **Testing**: Jest, React Testing Library
 
-### Demos
-- [Free Version](https://nextjs-free-demo.tailadmin.com)
-- [Pro Version](https://nextjs-demo.tailadmin.com)
+---
 
-### Other Versions
-- [HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
-- [React Version](https://github.com/TailAdmin/free-react-tailwind-admin-dashboard)
-- [Vue.js Version](https://github.com/TailAdmin/vue-tailwind-admin-dashboard)
+## **Setup Instructions**
 
-## Installation
+### **Prerequisites**
+- Node.js (v18 or higher)
+- PostgreSQL (local or cloud-hosted)
+- Git
 
-### Prerequisites
-To get started with TailAdmin, ensure you have the following prerequisites installed and set up:
+### **Steps**
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/levis-creator/JournalApp.git
+   cd personal-journaling-app
+   ```
 
-- Node.js 18.x or later (recommended to use Node.js 20.x or later)
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-### Cloning the Repository
-Clone the repository using the following command:
+3. **Set Up Environment Variables**:
+   - Create a `.env` file in the root directory.
+   - Add the following variables (see Environment Variables for details):
+     ```env
+     DATABASE_URL="postgresql://user:password@localhost:5432/journal_db"
+     JWT_SECRET="your_jwt_secret_key"
+     ```
 
-```bash
-git clone https://github.com/TailAdmin/free-nextjs-admin-dashboard.git
+4. **Set Up Database**:
+   - Run Prisma migrations to create the database schema:
+     ```bash
+     npx prisma migrate dev --name init
+     ```
+   
+
+5. **Run the Application**:
+   ```bash
+   npm run dev
+   ```
+   - The app will be available at `http://localhost:3000`.
+
+---
+
+## **Environment Variables**
+| **Variable**      | **Description**                                                                 |
+|--------------------|---------------------------------------------------------------------------------|
+| `DATABASE_URL`     | PostgreSQL connection string (e.g., `postgresql://user:password@localhost:5432/journal_db`). |
+| `JWT_SECRET`       | Secret key for signing JWTs.                                                   |
+| `NODE_ENV`         | Environment mode (`development`, `production`).                                |
+
+---
+
+## **API Documentation**
+
+### **Base URL**
+```
+http://localhost:3000/api
 ```
 
-> Windows Users: place the repository near the root of your drive if you face issues while cloning.
+### **Authentication**
+| **Endpoint**       | **Method** | **Description**                          | **Request Body**                                                                 |
+|--------------------|------------|------------------------------------------|----------------------------------------------------------------------------------|
+| `/auth/signup`     | POST       | Register a new user                      | `{ email: string, password: string }`                                            |
+| `/auth/login`      | POST       | Log in a user                            | `{ email: string, password: string }`                                            |
+| `/auth/logout`     | POST       | Log out the user                         | *None*                                                                           |
+| `/auth/me`         | GET        | Get current user details                 | *None*                                                                           |
 
-1. Install dependencies:
-    ```bash
-    npm install --legacy-peer-deps
-    # or
-    yarn install
-    ```
-    > Some included packages causes peer-deps issue with React 19 while installing.
-    >
-    > With npm the `--legacy-peer-deps` flag is a workaround for that at the moment.
+### **Journal Entries**
+| **Endpoint**       | **Method** | **Description**                          | **Request Body**                                                                 |
+|--------------------|------------|------------------------------------------|----------------------------------------------------------------------------------|
+| `/entries`         | GET        | Get all entries for the user             | *None*                                                                           |
+| `/entries`         | POST       | Create a new entry                       | `{ title: string, content: string, categories?: string[] }`                      |
+| `/entries/:id`     | GET        | Get a single entry by ID                 | *None*                                                                           |
+| `/entries/:id`     | PUT        | Update an entry                          | `{ title?: string, content?: string, categories?: string[] }`                    |
+| `/entries/:id`     | DELETE     | Delete an entry                          | *None*                                                                           |
 
-2. Start the development server:
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    ```
+### **Categories**
+| **Endpoint**       | **Method** | **Description**                          | **Request Body**                                                                 |
+|--------------------|------------|------------------------------------------|----------------------------------------------------------------------------------|
+| `/categories`      | GET        | Get all categories for the user          | *None*                                                                           |
+| `/categories`      | POST       | Create a new category                    | `{ name: string }`                                                               |
+| `/categories/:id`  | PUT        | Update a category name                   | `{ name: string }`                                                               |
+| `/categories/:id`  | DELETE     | Delete a category                        | *None*                                                                           |
 
-## Components
+### **Summaries**
+| **Endpoint**               | **Method** | **Description**                          | **Query Parameters**                                           |
+|----------------------------|------------|------------------------------------------|-----------------------------------------------------------------|
+| `/summary/entry-frequency` | GET        | Entry frequency heatmap data             | `startDate: string (ISO), endDate: string (ISO)`               |
+| `/summary/category-distribution` | GET | Category distribution (pie chart)        | *None*                                                         |
+| `/summary/word-count-trends` | GET       | Word count trends over time              | `interval: "day"|"week"|"month", startDate: string, endDate: string` |
+| `/summary/mood-analysis`   | GET        | Mood tracking (if bonus implemented)     | *None*                                                         |
 
-TailAdmin is a pre-designed starting point for building a web-based dashboard using Next.js and Tailwind CSS. The template includes:
+---
 
-- Sophisticated and accessible sidebar
-- Data visualization components
-- Profile management and custom 404 page
-- Tables and Charts(Line and Bar)
-- Authentication forms and input elements
-- Alerts, Dropdowns, Modals, Buttons and more
-- Can't forget Dark Mode 🕶️
+## **System Design**
+### **Architecture**
+- **Frontend**: Next.js with React for server-side rendering and client-side interactivity.
+- **Backend**: Next.js API routes for handling requests and Prisma for database interactions.
+- **Database**: PostgreSQL for relational data storage.
+- **Authentication**: JWT with HTTP-only cookies for secure session management.
 
-All components are built with React and styled using Tailwind CSS for easy customization.
+### **Data Model**
+- **User**: Stores user details (email, password hash).
+- **Entry**: Stores journal entries (title, content, date, user ID).
+- **Category**: Stores categories (name, user ID) with a many-to-many relationship to entries.
 
-## Feature Comparison
+### **Scaling Considerations**
+- **Database Indexing**: Indexes on frequently queried fields (e.g., `userId`, `date`).
+- **Caching**: Use Redis for caching summary data to reduce database load.
+- **Load Balancing**: Distribute traffic across multiple instances using a load balancer.
 
-### Free Version
-- 1 Unique Dashboard
-- 30+ dashboard components
-- 50+ UI elements
-- Basic Figma design files
-- Community support
+---
 
-### Pro Version
-- 5 Unique Dashboards: Analytics, Ecommerce, Marketing, CRM, Stocks (more coming soon)
-- 400+ dashboard components and UI elements
-- Complete Figma design file
-- Email support
+Here’s the updated **Testing** section of the `README.md` file to reflect that you're using **Vitest** for testing:
 
-To learn more about pro version features and pricing, visit our [pricing page](https://tailadmin.com/pricing).
+---
 
-## Changelog
+## **Testing**
+This project uses **Vitest** for unit and integration testing. Vitest is a fast and modern testing framework that integrates seamlessly with Vite and Next.js.
 
-### Version 2.0.1 - [February 27, 2025]
+### **Test Types**
+1. **Unit Tests**:
+   - Test individual functions, utilities, and components.
+   - Located in the `__tests__` or `tests` directory.
+   - Example: Testing a utility function that formats dates.
 
-#### Update Overview
+2. **Integration Tests**:
+   - Test API endpoints and database interactions.
+   - Located in the `__tests__/api` directory.
+   - Example: Testing the `/api/entries` endpoint to ensure it creates and retrieves journal entries correctly.
 
-- Upgraded to Tailwind CSS v4 for better performance and efficiency.
-- Updated class usage to match the latest syntax and features.
-- Replaced deprecated class and optimized styles.
+3. **Component Tests**:
+   - Test React components in isolation.
+   - Located in the `__tests__/components` directory.
+   - Example: Testing the `JournalEntryForm` component to ensure it renders and behaves as expected.
 
-#### Next Steps
+### **Running Tests**
+1. **Run All Tests**:
+   ```bash
+   npm test
+   ```
 
-- Run npm install or yarn install to update dependencies.
-- Check for any style changes or compatibility issues.
-- Refer to the Tailwind CSS v4 [Migration Guide](https://tailwindcss.com/docs/upgrade-guide) on this release. if needed.
-- This update keeps the project up to date with the latest Tailwind improvements. 🚀
+2. **Run Specific Test Files**:
+   ```bash
+   npm test path/to/test/file.test.ts
+   ```
 
-### v2.0.0 (February 2025)
-A major update focused on Next.js 15 implementation and comprehensive redesign.
+3. **Watch Mode**:
+   Run tests in watch mode for development:
+   ```bash
+   npm test -- --watch
+   ```
 
-#### Major Improvements
-- Complete redesign using Next.js 15 App Router and React Server Components
-- Enhanced user interface with Next.js-optimized components
-- Improved responsiveness and accessibility
-- New features including collapsible sidebar, chat screens, and calendar
-- Redesigned authentication using Next.js App Router and server actions
-- Updated data visualization using ApexCharts for React
+4. **Coverage Report**:
+   Generate a test coverage report:
+   ```bash
+   npm test -- --coverage
+   ```
 
-#### Breaking Changes
+### **Example Test**
+Here’s an example of a unit test for a utility function:
 
-- Migrated from Next.js 14 to Next.js 15
-- Chart components now use ApexCharts for React
-- Authentication flow updated to use Server Actions and middleware
+```typescript
+// tests/utils/formatDate.test.ts
+import { describe, it, expect } from 'vitest';
+import { formatDate } from '../../src/utils/formatDate';
 
-[Read more](https://tailadmin.com/docs/update-logs/nextjs) on this release.
+describe('formatDate', () => {
+  it('formats a date string correctly', () => {
+    const date = '2023-09-20T12:00:00Z';
+    const formattedDate = formatDate(date);
+    expect(formattedDate).toBe('September 20, 2023');
+  });
+});
+```
 
-#### Breaking Changes
-- Migrated from Next.js 14 to Next.js 15
-- Chart components now use ApexCharts for React
-- Authentication flow updated to use Server Actions and middleware
+### **Test Setup**
+- **Test Environment**: Configured in `vite.config.ts` or `vitest.config.ts`.
+- **Mocking**: Use Vitest’s built-in mocking capabilities for API calls and external dependencies.
+- **Database**: Use a separate test database or mock database interactions for integration tests.
 
-### v1.3.4 (July 01, 2024)
-- Fixed JSvectormap rendering issues
 
-### v1.3.3 (June 20, 2024)
-- Fixed build error related to Loader component
+Let me know if you need further details or examples for testing with Vitest!
+---
 
-### v1.3.2 (June 19, 2024)
-- Added ClickOutside component for dropdown menus
-- Refactored sidebar components
-- Updated Jsvectormap package
+## **Contributing**
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Submit a pull request with a detailed description of your changes.
 
-### v1.3.1 (Feb 12, 2024)
-- Fixed layout naming consistency
-- Updated styles
-
-### v1.3.0 (Feb 05, 2024)
-- Upgraded to Next.js 14
-- Added Flatpickr integration
-- Improved form elements
-- Enhanced multiselect functionality
-- Added default layout component
-
-## License
-
-TailAdmin Next.js Free Version is released under the MIT License.
-
-## Support
-
-If you find this project helpful, please consider giving it a star on GitHub. Your support helps us continue developing and maintaining this template.
+---
