@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  firstName      String
+  lastName       String
+  username       String         @unique
+  password       String
+  phone          String?        @unique
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  role           Role           @default(USER)
+  journalEntries JournalEntry[]
+  categories     Category[]
+  tags           Tag[]
+  sessions       Session[]
+
+  @@index([email])
+}
+
+model JournalEntry {
+  id         Int                    @id @default(autoincrement())
+  userId     Int
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  content    String
+  wordCount  Int
+  entryDate  DateTime               @default(now())
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+  categories JournalEntryCategory[]
+  tags       JournalEntryTag[]
+
+  @@index([userId])
+  @@index([entryDate])
+}
+
+model Category {
+  id        Int                    @id @default(autoincrement())
+  name      String
+  color     String?
+  userId    Int
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   JournalEntryCategory[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+
+  @@unique([userId, name])
+}
+
+model Tag {
+  id        Int               @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   JournalEntryTag[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@unique([userId, name])
+}
+
+model JournalEntryCategory {
+  journalEntryId Int
+  categoryId     Int
+  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  category       Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@id([journalEntryId, categoryId])
+}
+
+model JournalEntryTag {
+  journalEntryId Int
+  tagId          Int
+  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  tag            Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@id([journalEntryId, tagId])
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  valid     Boolean  @default(true)
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
